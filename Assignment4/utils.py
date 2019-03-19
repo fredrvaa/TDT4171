@@ -6,3 +6,4 @@ def read_data(filename):
         data.append(list(map(int,line.split())))
     file.close()
     return data
+
