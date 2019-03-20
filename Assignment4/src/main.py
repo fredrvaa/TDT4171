@@ -1,6 +1,6 @@
 from utils import read_data
 from test import testing
-from TreeNode import print_tree
+from TreeNode import TreeNode, print_tree
 
 if __name__ == '__main__':
     #Reading in train and test data
