@@ -15,13 +15,13 @@ y_test = data['y_test']
 
 #Hashing
 print('Hashing...')
-hv = HashingVectorizer(n_features=10, stop_words='english')
+hv = HashingVectorizer(n_features=10, stop_words='english', binary=True)
 x_train = hv.transform(x_train)
 x_test =hv.transform(x_test)
 
 #Instantiate classifier
 nb_classifier = BernoulliNB()
-dt_classifier = DecisionTreeClassifier(max_features=10)
+dt_classifier = DecisionTreeClassifier(max_features=10, criterion='gini')
 
 #Training classifier
 print('Training BernoulliNB Classifier...')

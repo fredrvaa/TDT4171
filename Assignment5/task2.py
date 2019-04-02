@@ -1,7 +1,10 @@
 import pickle
+import tensorflow as tf
 from keras.models import Sequential
 from keras.preprocessing.sequence import pad_sequences
+from keras.utils import to_categorical
 from keras.layers import Embedding, LSTM, Dense
+from keras.optimizers import RMSprop
 
 #Loading data
 print('Loading data...')
@@ -15,27 +18,31 @@ y_test = data['y_test']
 vocab_size = data['vocab_size']
 max_length = data['max_length']
 
-
 #Padding
 print('Padding...')
 x_train = pad_sequences(x_train, maxlen=max_length)
 x_test = pad_sequences(x_test, maxlen=max_length)
 
+y_train = to_categorical(y_train, num_classes=2)
+y_test = to_categorical(y_test, num_classes=2)
 
 #Model
 model = Sequential()
 
-model.add(Embedding(input_dim = vocab_size, output_dim = 64, input_shape = (max_length,)))
-model.add(LSTM(64))
-model.add(Dense(vocab_size))
+model.add(Embedding(input_dim = vocab_size, output_dim = 64))
+model.add(LSTM(units = 64, activation = 'relu'))
+model.add(Dense(units = 2))
 
 print('Compiling...')
-model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+model.compile(loss='categorical_crossentropy', optimizer=RMSprop(), metrics=['accuracy'])
 
-print('Training...')
-model.fit(epochs=10, steps_per_epoch=30)
+with tf.device('/GPU:0'):
+    print('Training...')
+    model.fit(x_train, y_train, epochs=3, batch_size = 64)
 
-accuracy = model.evaluate(x_test, y_test)
+print('Saved model...')
+model.save('models/lstm.h5')
 
-for a in accuracy:
-    print(a)
+evaluation = model.evaluate(x_test, y_test)
+
+print('Loss: {} | Accuracy: {}'.format(evaluation[0], evaluation[1]))
